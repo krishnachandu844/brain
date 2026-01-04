@@ -4,10 +4,13 @@ import { InstagramIcon } from "@/icons/InstagramIcon";
 import { TwitterIcon } from "@/icons/TwitterIcon";
 import { YoutubeIcon } from "@/icons/YoutubeIcon";
 import { cn } from "@/lib/utils";
+import { useContentStore } from "@/store/useContent";
+import axios from "axios";
 import { ChevronsLeft, Grid, MenuIcon } from "lucide-react";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
+import Cookies from "js-cookie";
 
 const asideItems = [
   {
@@ -23,7 +26,7 @@ const asideItems = [
     color: "#E1306C",
   },
   {
-    name: "YouTube",
+    name: "Youtube",
     type: "youtube",
     icon: <YoutubeIcon />,
     color: "#FF0000",
@@ -47,6 +50,34 @@ export function Navigation() {
   const [isHovered, setIsHovered] = useState<string>("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const matches = useMediaQuery("(min-width: 768px)");
+  const firstRef = useRef<HTMLDivElement>(null);
+
+  const setContents = useContentStore((state) => state.setContents);
+
+  const handleClick = async (type: string) => {
+    console.log(type);
+    const token = Cookies.get("braintoken");
+    if (token) {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/getcontent/${
+          type == "All" ? "" : type
+        }`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console;
+      setContents(response.data.contents);
+    }
+  };
+
+  useEffect(() => {
+    if (firstRef.current) {
+      firstRef.current.click();
+    }
+  }, []);
 
   useEffect(() => {
     if (matches) {
@@ -93,9 +124,13 @@ export function Navigation() {
             return (
               <div
                 key={index}
-                onClick={() => setActiveType(x.type)}
+                onClick={() => {
+                  setActiveType(x.type);
+                  handleClick(x.name);
+                }}
                 onMouseEnter={() => setIsHovered(x.type)}
                 onMouseLeave={() => setIsHovered("")}
+                ref={index == 0 ? firstRef : null}
                 style={{
                   backgroundColor:
                     isActive || Hovered ? `${x.color}20` : "transparent",

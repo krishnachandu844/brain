@@ -44,4 +44,17 @@ router.get("/getcontent", authMiddleWare, async (req, res) => {
   }
 });
 
+router.get("/getcontent/:type", authMiddleWare, async (req, res) => {
+  const { type } = req.params;
+  const userId = req.userId;
+  console.log(type);
+  try {
+    const contents = await Content.find(type ? { userId, type } : { userId });
+    res.json({ contents });
+    return;
+  } catch (error) {
+    res.status(401).json({ message: "Error while getting contents" });
+    return;
+  }
+});
 export default router;

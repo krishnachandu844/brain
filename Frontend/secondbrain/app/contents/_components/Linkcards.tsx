@@ -1,8 +1,6 @@
 "use client";
 
 import { useContentStore } from "@/store/useContent";
-
-import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -20,38 +18,12 @@ import {
   LinkIcon,
   X,
 } from "lucide-react";
-import axios from "axios";
-import Cookies from "js-cookie";
+
 import CreateContentButton from "./CreateContentButton";
-import {
-  FacebookEmbed,
-  InstagramEmbed,
-  TwitterEmbed,
-  YouTubeEmbed,
-} from "react-social-media-embed";
+import { FacebookEmbed, InstagramEmbed } from "react-social-media-embed";
 
 export default function LinkCard() {
-  const setContents = useContentStore((state) => state.setContents);
   const contents = useContentStore((state) => state.contents);
-
-  useEffect(() => {
-    const token = Cookies.get("braintoken");
-
-    const init = async () => {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/getcontent`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setContents(response.data.contents);
-    };
-
-    init();
-  }, [setContents]);
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
@@ -113,7 +85,7 @@ export default function LinkCard() {
         <hr />
       </div>
       <div
-        className='grid grid-cols-3 gap-6 p-4 h-[calc(90vh-120px)] 
+        className='grid xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-6 p-4 h-[calc(90vh-120px)] 
                 overflow-y-auto'
       >
         {contents.map((card, index) => (

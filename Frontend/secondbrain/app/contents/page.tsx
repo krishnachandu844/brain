@@ -4,6 +4,9 @@ import Appbar from "./_components/Appbar";
 import { CreateNote } from "./_components/CreateNote";
 import LinkCard from "./_components/Linkcards";
 import { Navigation } from "./_components/Navigation";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
 
 const Contents = () => {
   const contents = useContentStore((state) => state.contents);
@@ -12,8 +15,7 @@ const Contents = () => {
       <Navigation />
       <div className='flex flex-col w-full'>
         <Appbar />
-        {/* {contents.length > 0 ? <LinkCard /> : <CreateNote />} */}
-        <LinkCard />
+        {contents.length > 0 ? <LinkCard /> : <CreateNote />}
       </div>
     </div>
   );
