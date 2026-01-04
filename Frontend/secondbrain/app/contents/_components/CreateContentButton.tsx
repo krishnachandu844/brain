@@ -90,7 +90,7 @@ export default function CreateContentButton() {
           className='flex items-center gap-x-2 bg-primary text-white px-4 py-2 rounded-md cursor-pointer'
           role='button'
         >
-          Get Started <PlusCircleIcon />
+          Add Content <PlusCircleIcon />
         </p>
       </DialogTrigger>
 

@@ -11,6 +11,7 @@ interface Content {
 interface ContentStoreType {
   contents: Content[];
   addContent: (content: Content) => void;
+  setContents: (data: Content[]) => void;
 }
 
 export const useContentStore = create<ContentStoreType>((set) => ({
@@ -19,4 +20,5 @@ export const useContentStore = create<ContentStoreType>((set) => ({
     set((state) => ({
       contents: [...state.contents, content],
     })),
+  setContents: (data) => set({ contents: data }),
 }));

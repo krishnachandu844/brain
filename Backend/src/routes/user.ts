@@ -48,13 +48,9 @@ router.post("/signin", async (req, res) => {
 });
 
 router.get("/me", authMiddleWare, async (req, res) => {
-  const userId = req;
+  const userId = req.userId;
   try {
-    const user = await User.findById(userId).select({
-      id: String,
-      username: String,
-      password: String,
-    });
+    const user = await User.findById(userId).select("-password");
     res.status(200).json({ user });
     return;
   } catch (error) {
