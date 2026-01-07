@@ -10,17 +10,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tweet } from "react-tweet";
-import {
-  Youtube,
-  Twitter,
-  Facebook,
-  Instagram,
-  LinkIcon,
-  X,
-} from "lucide-react";
+import { Youtube, Twitter, Facebook, Instagram, LinkIcon } from "lucide-react";
 
 import CreateContentButton from "./CreateContentButton";
-import { FacebookEmbed, InstagramEmbed } from "react-social-media-embed";
+import {
+  FacebookEmbed,
+  InstagramEmbed,
+  YouTubeEmbed,
+} from "react-social-media-embed";
 
 export default function LinkCard() {
   const filteredContents = useContentStore((state) => state.filteredContents);
@@ -50,14 +47,14 @@ export default function LinkCard() {
           : link.split("v=")[1]?.split("&")[0];
 
         return (
-          <iframe
-            className='w-full h-56 rounded-md'
-            src={`https://www.youtube.com/embed/${videoId}`}
-            title='YouTube video'
-            allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-            allowFullScreen
-          />
-          //   <YouTubeEmbed url={link} width={440} height={250} />
+          // <iframe
+          //   className='w-full h-56 rounded-md'
+          //   src={`https://www.youtube.com/embed/${videoId}`}
+          //   title='YouTube video'
+          //   allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+          //   allowFullScreen
+          // />
+          <YouTubeEmbed url={link} width={440} height={250} />
         );
       }
 

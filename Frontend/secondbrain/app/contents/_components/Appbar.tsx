@@ -9,6 +9,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useContentStore } from "@/store/useContent";
 
 interface UserType {
   id: string;
@@ -18,6 +19,14 @@ interface UserType {
 
 export default function Appbar() {
   const [user, setUser] = useState<UserType>();
+
+  const setUserName = useContentStore((state) => state.setUserName);
+
+  const onClickLogout = () => {
+    Cookies.remove("braintoken");
+    window.location.href = "/";
+  };
+
   useEffect(() => {
     const token = Cookies.get("braintoken");
     const init = async () => {
@@ -30,6 +39,7 @@ export default function Appbar() {
           },
         }
       );
+      setUserName(response.data.user.username);
       setUser(response.data.user);
     };
     init();
@@ -52,7 +62,7 @@ export default function Appbar() {
         </TooltipContent>
       </Tooltip>
 
-      <Button>Log out</Button>
+      <Button onClick={onClickLogout}>Log out</Button>
     </div>
   );
 }

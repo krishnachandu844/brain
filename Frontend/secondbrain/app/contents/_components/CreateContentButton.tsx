@@ -43,19 +43,16 @@ export default function CreateContentButton() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const router = useRouter();
-
   const addcontent = useContentStore((state) => state.addContent);
 
   const createContent = async () => {
-    if (!title || !type || !description) {
+    console.log(title, description, type, link);
+    if (!title || !type || !description || !link) {
       toast.error("Please fill all required fields");
       return;
     }
 
     try {
-      setLoading(true);
-
       const token = Cookies.get("braintoken");
 
       const response = await axios.post(
@@ -72,8 +69,17 @@ export default function CreateContentButton() {
           },
         }
       );
-      addcontent(response.data.content);
-      console.log(response);
+      const data = {
+        title,
+        description,
+        link,
+        type,
+      };
+      addcontent(data, type);
+      setDescription("");
+      setLink("");
+      setTitle("");
+      setType("");
       toast.success("Content created successfully");
       setOpen(false);
     } catch (error: any) {
