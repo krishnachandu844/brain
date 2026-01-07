@@ -4,7 +4,7 @@ import { InstagramIcon } from "@/icons/InstagramIcon";
 import { TwitterIcon } from "@/icons/TwitterIcon";
 import { YoutubeIcon } from "@/icons/YoutubeIcon";
 import { cn } from "@/lib/utils";
-import { useContentStore } from "@/store/useContent";
+import { ContentType, useContentStore } from "@/store/useContent";
 import axios from "axios";
 import { ChevronsLeft, Grid, MenuIcon } from "lucide-react";
 import Image from "next/image";
@@ -52,24 +52,17 @@ export function Navigation() {
   const matches = useMediaQuery("(min-width: 768px)");
   const firstRef = useRef<HTMLDivElement>(null);
 
-  const setContents = useContentStore((state) => state.setContents);
+  const contents = useContentStore((state) => state.contents);
+  const setFilteredContents = useContentStore(
+    (state) => state.setFilteredContents
+  );
 
   const handleClick = async (type: string) => {
-    console.log(type);
-    const token = Cookies.get("braintoken");
-    if (token) {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/getcontent/${
-          type == "All" ? "" : type
-        }`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console;
-      setContents(response.data.contents);
+    if (type == "All") {
+      setFilteredContents(contents);
+    } else {
+      const filtered = contents.filter((c) => c.type == type);
+      setFilteredContents(filtered);
     }
   };
 

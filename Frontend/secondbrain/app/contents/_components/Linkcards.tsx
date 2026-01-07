@@ -23,7 +23,7 @@ import CreateContentButton from "./CreateContentButton";
 import { FacebookEmbed, InstagramEmbed } from "react-social-media-embed";
 
 export default function LinkCard() {
-  const contents = useContentStore((state) => state.contents);
+  const filteredContents = useContentStore((state) => state.filteredContents);
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
@@ -88,7 +88,7 @@ export default function LinkCard() {
         className='grid xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-6 p-4 h-[calc(90vh-120px)] 
                 overflow-y-auto'
       >
-        {contents.map((card, index) => (
+        {filteredContents.map((card, index) => (
           <Card
             key={index}
             className='flex flex-col transition-all duration-200 hover:shadow-lg h-full'
