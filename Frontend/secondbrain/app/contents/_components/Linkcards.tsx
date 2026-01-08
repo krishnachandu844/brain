@@ -10,7 +10,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tweet } from "react-tweet";
-import { Youtube, Twitter, Facebook, Instagram, LinkIcon } from "lucide-react";
+import {
+  Youtube,
+  Twitter,
+  Facebook,
+  Instagram,
+  LinkIcon,
+  Trash2Icon,
+  Edit,
+} from "lucide-react";
 
 import CreateContentButton from "./CreateContentButton";
 import {
@@ -18,22 +26,27 @@ import {
   InstagramEmbed,
   YouTubeEmbed,
 } from "react-social-media-embed";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
 
 export default function LinkCard() {
   const filteredContents = useContentStore((state) => state.filteredContents);
+  const deleteContent = useContentStore((state) => state.deleteContent);
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
       case "Youtube":
-        return <Youtube className='w-6 h-6 text-red-500' />;
+        return <Youtube className='w-7 h-7 text-red-500' />;
       case "Twitter":
-        return <Twitter className='w-6 h-6 text-blue-500' />;
+        return <Twitter className='w-7 h-7 text-blue-500' />;
       case "Facebook":
-        return <Facebook className='w-6 h-6 text-blue-600' />;
+        return <Facebook className='w-7 h-7 text-blue-600' />;
       case "Instagram":
-        return <Instagram className='w-6 h-6 text-pink-500' />;
+        return <Instagram className='w-7 h-7 text-pink-500' />;
       default:
-        return <LinkIcon className='w-6 h-6' />;
+        return <LinkIcon className='w-7 h-7' />;
     }
   };
 
@@ -42,20 +55,7 @@ export default function LinkCard() {
 
     switch (type) {
       case "Youtube": {
-        const videoId = link.includes("youtu.be")
-          ? link.split("youtu.be/")[1]
-          : link.split("v=")[1]?.split("&")[0];
-
-        return (
-          // <iframe
-          //   className='w-full h-56 rounded-md'
-          //   src={`https://www.youtube.com/embed/${videoId}`}
-          //   title='YouTube video'
-          //   allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-          //   allowFullScreen
-          // />
-          <YouTubeEmbed url={link} width={440} height={250} />
-        );
+        return <YouTubeEmbed url={link} width={440} height={250} />;
       }
 
       case "Instagram":
@@ -75,6 +75,23 @@ export default function LinkCard() {
     }
   };
 
+  const deleteItem = async (id: string) => {
+    deleteContent(id);
+    const token = Cookies.get("braintoken");
+    if (!token) return;
+
+    const res = await axios.delete(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/deletecontent/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(res.data);
+    toast.success(res.data.message);
+  };
+
   return (
     <div className='h-full p-8'>
       <div className='space-y-4'>
@@ -92,13 +109,29 @@ export default function LinkCard() {
           >
             <CardHeader className='pb-3'>
               <div className='flex items-start justify-between gap-3'>
-                <div className='flex items-center gap-3'>
-                  {getPlatformIcon(card.type)}
-                  <div>
-                    <CardTitle className='text-lg'>{card.title}</CardTitle>
-                    <CardDescription className='text-xs'>
-                      Share your content
-                    </CardDescription>
+                <div className='flex items-center justify-between w-full gap-3'>
+                  <div className='flex items-center gap-x-2.5'>
+                    {getPlatformIcon(card.type)}
+                    <div>
+                      <CardTitle className='text-lg'>{card.title}</CardTitle>
+                      <CardDescription className='text-xs'>
+                        Share your content
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <div className='space-x-2'>
+                    <Button variant={"secondary"} className='cursor-pointer'>
+                      <Edit />
+                    </Button>
+                    <Button
+                      variant={"destructive"}
+                      className='cursor-pointer'
+                      onClick={() => {
+                        deleteItem(card._id!);
+                      }}
+                    >
+                      <Trash2Icon />
+                    </Button>
                   </div>
                 </div>
               </div>

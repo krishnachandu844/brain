@@ -36,7 +36,7 @@ router.get("/getcontent", authMiddleWare, async (req, res) => {
   const { userId } = req;
   try {
     const contents = await Content.find({ userId });
-    res.json({ contents });
+    res.status(200).json({ contents });
     return;
   } catch (error) {
     res.status(401).json({ message: "Error while getting contents" });
@@ -44,4 +44,15 @@ router.get("/getcontent", authMiddleWare, async (req, res) => {
   }
 });
 
+router.delete("/deletecontent/:deleteId", authMiddleWare, async (req, res) => {
+  const { deleteId } = req.params;
+  console.log(deleteId);
+  try {
+    const deletedContent = await Content.findByIdAndDelete(deleteId);
+    res.status(200).json({ message: "Content Deleted Successfully" });
+  } catch (error) {
+    res.status(401).json({ message: "Error while Deleting content" });
+    return;
+  }
+});
 export default router;
