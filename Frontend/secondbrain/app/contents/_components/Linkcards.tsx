@@ -30,10 +30,13 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
+import UpdateButton from "./UpadteButton";
+import { useRouter } from "next/navigation";
 
 export default function LinkCard() {
   const filteredContents = useContentStore((state) => state.filteredContents);
   const deleteContent = useContentStore((state) => state.deleteContent);
+  const router = useRouter();
 
   const getPlatformIcon = (platform: string) => {
     switch (platform) {
@@ -88,8 +91,11 @@ export default function LinkCard() {
         },
       }
     );
-    console.log(res.data);
-    toast.success(res.data.message);
+    if (res.status == 200) {
+      toast.success(res.data.message);
+    } else {
+      toast.error(res.data.message);
+    }
   };
 
   return (
@@ -120,9 +126,8 @@ export default function LinkCard() {
                     </div>
                   </div>
                   <div className='space-x-2'>
-                    <Button variant={"secondary"} className='cursor-pointer'>
-                      <Edit />
-                    </Button>
+                    <UpdateButton card={card} />
+
                     <Button
                       variant={"destructive"}
                       className='cursor-pointer'

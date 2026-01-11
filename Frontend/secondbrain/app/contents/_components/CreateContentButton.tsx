@@ -32,7 +32,6 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
 import { useContentStore } from "@/store/useContent";
 
 export default function CreateContentButton() {

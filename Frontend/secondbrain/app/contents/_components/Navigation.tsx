@@ -59,10 +59,10 @@ export function Navigation() {
 
   const handleClick = async (type: string) => {
     if (type == "All") {
-      setFilteredContents(contents);
+      setFilteredContents(contents, type);
     } else {
       const filtered = contents.filter((c) => c.type == type);
-      setFilteredContents(filtered);
+      setFilteredContents(filtered, type);
     }
   };
 

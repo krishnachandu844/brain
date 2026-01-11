@@ -44,9 +44,36 @@ router.get("/getcontent", authMiddleWare, async (req, res) => {
   }
 });
 
+router.put("/updatecontent/:contentId", authMiddleWare, async (req, res) => {
+  const { contentId } = req.params;
+  const { title, description, link, type } = req.body;
+  const updateObj = {
+    title,
+    description,
+    link,
+    type,
+  };
+  try {
+    const updatedContent = await Content.findByIdAndUpdate(
+      { _id: contentId, userId: req.userId },
+      updateObj,
+      {
+        new: true,
+      }
+    );
+    if (!updatedContent) {
+      res.status(404).json({ message: "Content not found" });
+      return;
+    }
+    return res.status(200).json({ message: "Content Updated Successfully" });
+  } catch (error) {
+    res.status(401).json({ message: "Error while Updating content" });
+    return;
+  }
+});
+
 router.delete("/deletecontent/:deleteId", authMiddleWare, async (req, res) => {
   const { deleteId } = req.params;
-  console.log(deleteId);
   try {
     const deletedContent = await Content.findByIdAndDelete(deleteId);
     res.status(200).json({ message: "Content Deleted Successfully" });

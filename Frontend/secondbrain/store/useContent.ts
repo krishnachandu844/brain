@@ -1,6 +1,7 @@
 import axios from "axios";
 import { create } from "zustand";
 import Cookies from "js-cookie";
+import { title } from "process";
 
 export interface ContentType {
   _id?: string;
@@ -24,21 +25,22 @@ interface ContentStoreType {
   filteredContents: ContentType[];
   addContent: (content: ContentType, activeType: string) => void;
   deleteContent: (id: string) => void;
+  updateContent: (data: ContentType) => void;
   setContents: (data: ContentType[]) => void;
-  setFilteredContents: (data: ContentType[]) => void;
+  setFilteredContents: (data: ContentType[], type: string) => void;
   fetchContent: () => void;
 }
 
 export const useContentStore = create<ContentStoreType>((set, get) => ({
   user: "",
-  setUserName: (username) => {
-    set({ user: username });
-  },
   contents: [],
   filteredContents: [],
   activeType: "All",
-  addContent: (content, activeType) => {
-    const { contents } = get();
+  setUserName: (username) => {
+    set({ user: username });
+  },
+  addContent: (content) => {
+    const { contents, activeType } = get();
     const updateContents = [...contents, content];
     set((state) => ({
       activeType: activeType,
@@ -60,9 +62,31 @@ export const useContentStore = create<ContentStoreType>((set, get) => ({
           : contentsAfterDeleted.filter((c) => c.type == activeType),
     });
   },
-  setContents: (data) => set({ contents: data }),
-  setFilteredContents: (data) =>
+  updateContent: (data) => {
+    const { contents, activeType } = get();
+    const contentsAfterUpdated = contents.map((c) =>
+      c._id == data._id
+        ? {
+            _id: data._id,
+            title: data.title,
+            description: data.description,
+            link: data.link,
+            type: data.type,
+          }
+        : c
+    );
     set({
+      contents: contentsAfterUpdated,
+      filteredContents:
+        activeType == "All"
+          ? contentsAfterUpdated
+          : contentsAfterUpdated.filter((c) => c.type == activeType),
+    });
+  },
+  setContents: (data) => set({ contents: data }),
+  setFilteredContents: (data, type) =>
+    set({
+      activeType: type,
       filteredContents: [...data],
     }),
   async fetchContent() {
