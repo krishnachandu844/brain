@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 
 const useUser = () => {
   const [user, setUser] = useState(null);
@@ -22,8 +21,6 @@ const useUser = () => {
         console.log(res);
         if (response.ok) {
           setUser(res.user);
-        } else {
-          toast.error(res.message);
         }
       } catch (error) {
         console.log(error);

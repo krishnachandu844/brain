@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Signin from "./pages/signin";
 import Signup from "./pages/signup";
 import { Landing } from "./pages/Landing";
-import Navbar from "./components/ui/Navbar";
+import Navbar from "./components/shared/Navbar";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuthStore } from "./store/useAuthStore";

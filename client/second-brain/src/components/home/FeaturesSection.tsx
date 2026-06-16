@@ -2,7 +2,7 @@ import { Sparkles, Search, Tag } from "lucide-react";
 
 const FeaturesSection = () => {
   return (
-    <section className='py-20 max-w-6xl mx-auto'>
+    <section className='py-20 max-w-6xl mx-auto px-2'>
       <div className='grid md:grid-cols-3 gap-6'>
         {[
           {

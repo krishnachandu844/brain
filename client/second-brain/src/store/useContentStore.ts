@@ -54,7 +54,11 @@ export const useContentStore = create<ContentStoreTypes>((set, get) => ({
 
       const res = await response.json();
       if (response.ok) {
-        set({ posts: res.contents, filteredPosts: res.contents });
+        set({
+          posts: res.contents,
+          filteredPosts: res.contents,
+          activeType: "all",
+        });
       } else {
         toast.error(res.message);
       }

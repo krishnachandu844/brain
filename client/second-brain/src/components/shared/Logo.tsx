@@ -1,8 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-type Props = {};
-
-const Logo = (props: Props) => {
+const Logo = () => {
   const navigate = useNavigate();
   return (
     <div

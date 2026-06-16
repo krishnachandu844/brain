@@ -2,14 +2,20 @@ import express from "express";
 import { authMiddleware } from "../middleware";
 import { prisma } from "../../lib/prisma";
 import { Type } from "../../generated/prisma/enums";
+import { ContentSchema } from "../lib/types";
 
 const router = express.Router();
 
 //addding content
 router.post("/addcontent", authMiddleware, async (req, res) => {
-  const { title, type, link, description } = req.body;
+  const result = ContentSchema.safeParse(req.body);
+  if (!result.success) {
+    return res.status(400).json({ message: "Inavlid Data" });
+  }
+
   const userId = req.userId;
   try {
+    const { title, type, link, description } = result.data;
     const newContent = await prisma.content.create({
       data: {
         title,

@@ -4,13 +4,18 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { prisma } from "../../lib/prisma";
 import { authMiddleware } from "../middleware";
+import { SigninSchema, SignupSchema } from "../lib/types";
 
 const router = express.Router();
 
 //signup
 router.post("/signup", async (req, res) => {
-  const { email, username, password } = req.body;
+  const result = SignupSchema.safeParse(req.body);
+  if (!result.success) {
+    return res.status(400).json({ message: "Inavlid Credentials" });
+  }
   try {
+    const { email, username, password } = result.data;
     const user = await prisma.user.findUnique({
       where: {
         username,
@@ -57,8 +62,12 @@ router.post("/signup", async (req, res) => {
 
 //signin
 router.post("/signin", async (req, res) => {
-  const { username, password } = req.body;
+  const result = SigninSchema.safeParse(req.body);
+  if (!result.success) {
+    return res.status(400).json({ message: "Inavlid Credentials" });
+  }
   try {
+    const { username, password } = result.data;
     const user = await prisma.user.findUnique({
       where: {
         username,

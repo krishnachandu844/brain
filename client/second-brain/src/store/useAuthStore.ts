@@ -67,7 +67,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       },
     );
     const data = await response.json();
-    console.log(data);
     if (!response.ok) {
       toast.error("Logout Unsuccessfull");
     } else {
@@ -76,7 +75,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         isAuthenticated: false,
         loading: false,
       });
-      toast.success(data.message);
+      toast.success("Logout Successfull");
     }
   },
 }));

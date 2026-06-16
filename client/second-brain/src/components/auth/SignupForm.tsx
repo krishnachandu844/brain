@@ -10,20 +10,41 @@ import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { useState } from "react";
+import { submitSignUp } from "../../services/SignupService";
+import { useAuthStore } from "../../store/useAuthStore";
+import { toast } from "react-toastify";
 
-type Props = {
-  values: { email: string; username: string; password: string };
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSubmit: (e: any) => void;
-  show: boolean;
-  loading: boolean;
-  setShow: (e: any) => void;
+type SignUpFormFields = {
+  email: string;
+  username: string;
+  password: string;
 };
 
-const SignupForm = (props: Props) => {
-  const { values, onSubmit, handleChange, show, setShow, loading } = props;
+const SignupForm = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignUpFormFields>({
+    mode: "onChange",
+  });
+  const [show, setShow] = useState(false);
+  const { getUser } = useAuthStore();
 
   const navigate = useNavigate();
+
+  const onSubmit: SubmitHandler<SignUpFormFields> = async (data) => {
+    try {
+      const res = await submitSignUp(data);
+      await getUser();
+      navigate("/dashboard", { replace: true });
+      toast.success(res.message);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
 
   return (
     <div className='w-full max-w-lg flex flex-col items-center  space-y-3'>
@@ -38,36 +59,70 @@ const SignupForm = (props: Props) => {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={onSubmit} className='space-y-5'>
+          <form className='space-y-5' onSubmit={handleSubmit(onSubmit)}>
             <div className='space-y-1.5'>
               <Label className='text-md'>Email</Label>
               <Input
-                placeholder='useExample@gmail.com'
-                type='email'
-                onChange={handleChange}
-                name='email'
-                value={values.email}
+                placeholder='userExample@gmail.com'
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Please enter a valid email address",
+                  },
+                })}
               />
+              {errors.email && (
+                <p className='text-red-500 text-sm text-left'>
+                  {errors.email.message}
+                </p>
+              )}
             </div>
             <div className='space-y-1.5'>
               <Label className='text-md'>Username</Label>
               <Input
                 placeholder='John Doe'
-                onChange={handleChange}
-                name='username'
-                value={values.username}
+                {...register("username", {
+                  required: "Username is Required",
+                  minLength: {
+                    value: 4,
+                    message: "Username should be atleast 4 charachters",
+                  },
+                  maxLength: {
+                    value: 10,
+                    message: "Username should be 10 charachters",
+                  },
+                })}
               />
+              {errors.username && (
+                <p className='text-red-500 text-sm text-left'>
+                  {errors.username.message}
+                </p>
+              )}
             </div>
             <div className='space-y-1.5 relative'>
               <Label className='text-md'>Password</Label>
               <Input
                 type={show ? "text" : "password"}
                 placeholder='••••••••'
-                onChange={handleChange}
-                name='password'
-                value={values.password}
+                {...register("password", {
+                  required: "Password is Required",
+                  minLength: {
+                    value: 4,
+                    message: "Password should be atleast 4 charachters",
+                  },
+                  maxLength: {
+                    value: 10,
+                    message: "Password should be 10 charachters",
+                  },
+                })}
                 className='relative'
               />
+              {errors.password && (
+                <p className='text-red-500 text-sm text-left'>
+                  {errors.password.message}
+                </p>
+              )}
               {show ? (
                 <Eye
                   className='w-5 h-5 absolute right-3 top-8 cursor-pointer'
@@ -85,9 +140,9 @@ const SignupForm = (props: Props) => {
                 className='w-full'
                 size={"lg"}
                 type='submit'
-                disabled={!values.password || !values.username || !values.email}
+                disabled={isSubmitting}
               >
-                {loading ? "Creating ..." : "Create Account"}
+                {isSubmitting ? "Creating ..." : "Create Account"}
               </Button>
             </div>
           </form>

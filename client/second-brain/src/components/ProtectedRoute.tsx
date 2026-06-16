@@ -4,7 +4,6 @@ import { Spinner } from "./ui/spinner";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuthStore();
-  console.log(user);
 
   if (loading) {
     return (

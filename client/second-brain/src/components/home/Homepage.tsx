@@ -6,7 +6,7 @@ import ImageSection from "./ImageSection";
 const Homepage = () => {
   return (
     <div>
-      <div className='w-300 container mx-auto'>
+      <div className='md:w-300 container mx-auto'>
         <Hero />
         <ImageSection />
         <FeaturesSection />

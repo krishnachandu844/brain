@@ -8,6 +8,7 @@ import { Balloon } from "lucide-react";
 export const PLATFOMS = [
   {
     id: "all",
+    type: "ALL",
     label: "All",
     icon: Balloon,
   },

@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <div className='min-h-screen flex flex-col py-36 items-center text-center space-y-6'>
       <h1 className='text-6xl max-w-2xl font-semibold'>
@@ -18,7 +21,13 @@ const Hero = () => {
         <Button size={"lg"} className='p-6'>
           Start your vault-free
         </Button>
-        <Button variant={"ghost"} className='p-6'>
+        <Button
+          variant={"ghost"}
+          className='p-6 bg-secondary'
+          onClick={() => {
+            navigate("/signin", { replace: true });
+          }}
+        >
           Signin
         </Button>
       </div>

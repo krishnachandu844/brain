@@ -1,12 +1,7 @@
 import { Trash } from "lucide-react";
 import { YoutubeIcon } from "../../icons/YoutubeIcon";
-import {
-  FacebookEmbed,
-  InstagramEmbed,
-  TwitterEmbed,
-  YouTubeEmbed,
-} from "react-social-media-embed";
-import { useCallback, useEffect } from "react";
+import { InstagramEmbed, XEmbed, YouTubeEmbed } from "react-social-media-embed";
+import { useCallback, useEffect, useState } from "react";
 import { useContentStore } from "../../store/useContentStore";
 import EmptyState from "./EmptyState";
 import { Spinner } from "../ui/spinner";
@@ -16,10 +11,13 @@ import FacebookIcon from "../../icons/FacebookIcon";
 import { LinkedInIcon } from "../../icons/LinkedInIcon";
 import { toast } from "react-toastify";
 
-type Props = {};
+interface Props {
+  isSmallDevice: boolean;
+}
 
 const PostCard = (props: Props) => {
   const { filteredPosts, getPosts } = useContentStore();
+  const [loading, setLoading] = useState(false);
 
   const getIcon = (option: string) => {
     switch (option) {
@@ -43,56 +41,77 @@ const PostCard = (props: Props) => {
 
   const getUrl = (url: string, type: string) => {
     switch (type) {
-      case "YOUTUBE": {
-        return <YouTubeEmbed url={url} width={350} height={200} />;
-      }
+      case "YOUTUBE":
+        return (
+          <div className='w-full max-w-md'>
+            <YouTubeEmbed url={url} width='100%' height={300} />
+          </div>
+        );
+
       case "INSTAGRAM": {
         const instaUrl = url.match(
           /https?:\/\/(www\.)?instagram\.com\/(p|reel)\/[^\s"]+/,
         )?.[0];
 
-        if (!instaUrl) {
-          return <div>Invalid Instagram URL</div>;
-        }
-
-        return <InstagramEmbed url={instaUrl} width={328} />;
-      }
-      case "TWITTER": {
-        const tweetUrl = url.match(/https?:\/\/(twitter|x)\.com\/[^\s"]+/)?.[0];
-
-        if (!tweetUrl) {
-          return <div>Invalid Twitter URL</div>;
-        }
-
-        return <TwitterEmbed url={tweetUrl} width={325} />;
-      }
-      case "FACEBOOK": {
-        const embedUrl = `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&show_text=true`;
+        if (!instaUrl) return <div>Invalid Instagram URL</div>;
 
         return (
-          <div className=''>
-            <iframe
-              src={embedUrl}
-              allowFullScreen
-              width={300}
-              height={450}
-              style={{
-                overflow: "auto",
-              }}
+          <div className='h-[350px] overflow-y-auto'>
+            <InstagramEmbed
+              url={instaUrl}
+              width={props.isSmallDevice ? 460 : 350}
             />
           </div>
         );
       }
+
+      case "TWITTER": {
+        const tweetUrl = url.match(/https?:\/\/(twitter|x)\.com\/[^\s"]+/)?.[0];
+
+        if (!tweetUrl) return <div>Invalid Twitter URL</div>;
+
+        return (
+          <div className='w-full max-w-md'>
+            <XEmbed
+              url={tweetUrl}
+              width={props.isSmallDevice ? 460 : 350}
+              height={350}
+            />
+          </div>
+        );
+      }
+
+      case "FACEBOOK": {
+        const embedUrl = `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(
+          url,
+        )}&show_text=true`;
+
+        return (
+          <iframe
+            src={embedUrl}
+            className='w-full max-w-md rounded-md'
+            height={props.isSmallDevice ? 460 : 350}
+            allowFullScreen
+          />
+        );
+      }
+
       case "LINKEDIN": {
         const src = url.match(/src="([^"]+)"/)?.[1];
-        return <iframe src={src} className='' width={350} height={350} />;
+
+        if (!src) return <div>Invalid LinkedIn embed</div>;
+
+        return <iframe src={src} className='w-full max-w-md' height={350} />;
       }
+
+      default:
+        return <div>Unsupported platform</div>;
     }
   };
 
   const deletePost = useCallback(async (id: string) => {
-    console.log(id);
     try {
+      setLoading(true);
       const response = await fetch(
         `${import.meta.env.VITE_BASE_URL}/api/v1/deletecontent/${id}`,
         {
@@ -105,10 +124,12 @@ const PostCard = (props: Props) => {
       );
       const res = await response.json();
       if (response.ok) {
+        setLoading(false);
         toast.success(res.message);
         getPosts();
       } else {
         toast.error(res.message);
+        setLoading(false);
       }
     } catch (error) {
       console.log(error);
@@ -119,7 +140,7 @@ const PostCard = (props: Props) => {
     getPosts();
   }, []);
 
-  if (!filteredPosts) {
+  if (!filteredPosts || loading) {
     return (
       <div className='pt-36 flex items-center justify-center'>
         <Spinner className='size-10 text-primary' />
@@ -127,39 +148,41 @@ const PostCard = (props: Props) => {
     );
   }
 
-  return (
-    <div className='grid grid-cols-2 gap-y-4'>
-      {filteredPosts.length == 0 ? (
-        <div className='min-w-dvh'>
-          <EmptyState />
-        </div>
-      ) : (
-        filteredPosts.map((p) => (
-          <div
-            className='bg-card max-w-sm shadow-lg p-4 rounded-xl space-y-4 group'
-            key={p.id}
-          >
-            <div className='flex justify-between'>
-              <div className='flex items-center gap-x-2'>
-                {getIcon(p.type)}
-                {p.type.toLowerCase()}
-              </div>
-              <Trash
-                className='w-4 h-4 opacity-0 group-hover:opacity-100 hover:text-red-500 cursor-pointer'
-                onClick={() => {
-                  deletePost(p.id);
-                }}
-              />
-            </div>
-            <div>{getUrl(p.link, p.type)}</div>
+  if (filteredPosts.length == 0) {
+    return (
+      <div className='w-full'>
+        <EmptyState />
+      </div>
+    );
+  }
 
-            <div>
-              <h1 className='text-xl font-semibold'>{p.title}</h1>
-              <p className='text-sm pt-2 text-gray-500'>{p.description}</p>
+  return (
+    <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 place-items-center '>
+      {filteredPosts.map((p) => (
+        <div
+          className='bg-card max-w-lg shadow-lg p-4 rounded-xl space-y-4 group w-full'
+          key={p.id}
+        >
+          <div className='flex justify-between'>
+            <div className='flex items-center gap-x-2'>
+              {getIcon(p.type)}
+              {p.type.toLowerCase()}
             </div>
+            <Trash
+              className='w-4 h-4 opacity-0 group-hover:opacity-100 hover:text-red-500 cursor-pointer'
+              onClick={() => {
+                deletePost(p.id);
+              }}
+            />
           </div>
-        ))
-      )}
+          <div>{getUrl(p.link, p.type)}</div>
+
+          <div>
+            <h1 className='text-xl font-semibold'>{p.title}</h1>
+            <p className='text-sm pt-2 text-gray-500'>{p.description}</p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
